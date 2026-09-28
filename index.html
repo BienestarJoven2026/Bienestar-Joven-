@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bienestar Joven</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(145deg,#f8d9f5,#d9c7ff);min-height:100vh;color:#4b315c}
+.app{max-width:430px;margin:auto;min-height:100vh;background:#fff9ff;box-shadow:0 0 30px #8d6ba033}
+header{background:linear-gradient(135deg,#a855f7,#ec78cf);color:white;padding:28px 22px;border-radius:0 0 28px 28px}
+header h1{margin:0;font-size:30px}header p{margin:7px 0 0;opacity:.95}
+main{padding:22px}.card{background:white;border-radius:22px;padding:20px;margin-bottom:16px;box-shadow:0 7px 20px #8b5cf622}
+h2{margin-top:0;color:#743c91}.moods{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.mood{border:0;background:#f5eaff;border-radius:15px;padding:10px;font-size:25px;cursor:pointer}.mood:hover{transform:scale(1.05)}
+button.primary{width:100%;border:0;border-radius:18px;padding:15px;background:#9b51e8;color:white;font-size:16px;font-weight:bold;cursor:pointer}
+.chat{height:390px;overflow:auto;background:#faf5ff;border-radius:18px;padding:12px}.msg{max-width:82%;padding:11px 14px;border-radius:17px;margin:9px 0;line-height:1.35}.bot{background:#ead9ff;margin-right:auto}.user{background:#ffd8ef;margin-left:auto}
+.row{display:flex;gap:8px;margin-top:10px}.row input{flex:1;border:1px solid #dec8ea;border-radius:16px;padding:12px;outline:none}.row button{border:0;border-radius:16px;padding:0 17px;background:#9b51e8;color:white;font-size:20px}
+.small{font-size:13px;color:#816c8b}.back{border:0;background:none;color:#743c91;font-weight:bold;cursor:pointer;padding:0 0 14px}
+#chatScreen,#helpScreen{display:none}.help{background:#fff0f7;border-left:5px solid #e878b5;padding:14px;border-radius:12px}
+</style>
+</head>
+<body>
+<div class="app">
+<header><h1>💜 Bienestar Joven</h1><p>Un espacio para hablar, sentir y ser escuchado.</p></header>
+
+<main id="home">
+<div class="card">
+<h2>¿Cómo te sientes hoy?</h2>
+<div class="moods">
+<button class="mood" onclick="mood('feliz')">😊</button>
+<button class="mood" onclick="mood('triste')">😔</button>
+<button class="mood" onclick="mood('enojado')">😡</button>
+<button class="mood" onclick="mood('estresado')">😰</button>
+<button class="mood" onclick="mood('confundido')">😐</button>
+</div>
+<p id="moodText" class="small">Elige una emoción para recibir un mensaje.</p>
+</div>
+<div class="card">
+<h2>💬 ¿Quieres hablar?</h2>
+<p>Puedes escribir lo que estás sintiendo. Este espacio está pensado para acompañarte.</p>
+<button class="primary" onclick="show('chatScreen')">Hablar con Bienestar Joven</button>
+</div>
+<div class="card">
+<h2>🌷 Recuerda</h2>
+<p>No tienes que resolver todo de una vez. Hablar con alguien de confianza también puede ayudar.</p>
+</div>
+<div class="card">
+<button class="primary" onclick="show('helpScreen')">🆘 Necesito ayuda</button>
+</div>
+</main>
+
+<main id="chatScreen">
+<button class="back" onclick="show('home')">← Volver</button>
+<div class="card">
+<h2>💬 Chat</h2>
+<div class="chat" id="chat">
+<div class="msg bot">Hola 💗 Estoy aquí para escucharte. ¿Qué quieres contarme?</div>
+</div>
+<div class="row">
+<input id="input" placeholder="Escribe cómo te sientes..." onkeydown="if(event.key==='Enter')send()">
+<button onclick="send()">➤</button>
+</div>
+<p class="small">Este chat ofrece mensajes generales de apoyo y no reemplaza la ayuda de un adulto de confianza o un profesional.</p>
+</div>
+</main>
+
+<main id="helpScreen">
+<button class="back" onclick="show('home')">← Volver</button>
+<div class="card">
+<h2>🆘 Buscar ayuda</h2>
+<div class="help"><b>Si estás pasando por algo que te preocupa mucho:</b><br><br>Habla con un adulto de confianza, un familiar, un docente u orientador de tu institución. Si existe un peligro inmediato, busca ayuda de emergencia de tu localidad.</div>
+</div>
+</main>
+</div>
+
+<script>
+function show(id){document.querySelectorAll('main').forEach(x=>x.style.display='none');document.getElementById(id).style.display='block';window.scrollTo(0,0)}
+function mood(m){
+const t={feliz:"¡Qué bonito! 😊 Disfruta este momento y compártelo con alguien.",triste:"Está bien no sentirse bien todo el tiempo. 💜 Date permiso para hablar de lo que pasa.",enojado:"Tu emoción es válida. 🌷 Respira un momento y, cuando puedas, cuéntale a alguien de confianza.",estresado:"Vamos paso a paso. 💗 No tienes que solucionar todo al mismo tiempo.",confundido:"No tener todo claro también está bien. 🌸 Puedes empezar contando qué es lo que más te preocupa."};
+document.getElementById('moodText').textContent=t[m];
+}
+function send(){
+const input=document.getElementById('input'), text=input.value.trim(); if(!text)return;
+const chat=document.getElementById('chat');
+chat.innerHTML+=`<div class="msg user">${escapeHtml(text)}</div>`;
+input.value='';
+setTimeout(()=>{chat.innerHTML+=`<div class="msg bot">${reply(text)}</div>`;chat.scrollTop=chat.scrollHeight},350);
+chat.scrollTop=chat.scrollHeight;
+}
+function reply(t){
+t=t.toLowerCase();
+if(/trist|llor|solo|sola|mal/.test(t)) return "Siento que estés pasando por un momento difícil. 💜 Gracias por contarlo. Si puedes, habla también con alguien de confianza.";
+if(/estres|tarea|colegio|examen/.test(t)) return "Parece que tienes muchas cosas encima. 🌷 Intenta ir una cosa a la vez y busca apoyo si lo necesitas.";
+if(/enoja|rabia|furia/.test(t)) return "Entiendo que estés sintiendo mucha rabia. 💗 Tómate un momento para calmarte y, cuando estés listo, habla con alguien de confianza.";
+if(/feliz|bien|content/.test(t)) return "¡Me alegra leerte así! 😊 Disfruta ese momento y, si quieres, cuéntame qué pasó.";
+return "Gracias por confiar en Bienestar Joven. 💜 Puedes seguir contándome lo que sientes. También puede ayudarte hablar con una persona de confianza.";
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+</script>
+</body>
+</html>
